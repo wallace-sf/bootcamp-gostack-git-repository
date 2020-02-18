@@ -102,7 +102,29 @@ export const IssueList = styled.ul`
   }
 `;
 
-export const IssueFilter = styled.div``;
+export const IssueFilter = styled.div`
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  button {
+    padding: 10px 15px;
+    background-color: #b8b7b7;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+
+    & + button {
+      margin-left: 10px;
+    }
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+`;
 
 export const Pagination = styled.div`
   margin-top: 20px;
