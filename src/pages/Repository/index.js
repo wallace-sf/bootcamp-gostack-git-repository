@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { MdArrowForward, MdArrowBack } from 'react-icons/md';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, IssueFilter, Pagination } from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -24,11 +25,12 @@ export default class Repository extends Component {
       { state: 'open', label: 'Abertas', active: false },
       { state: 'closed', label: 'Fechadas', active: false },
     ],
+    page: 1,
   };
 
   async componentDidMount() {
     const { match } = this.props;
-    const { filters } = this.state;
+    const { filters, page } = this.state;
 
     const repoName = decodeURIComponent(match.params.repository);
 
@@ -37,6 +39,7 @@ export default class Repository extends Component {
       api.get(`/repos/${repoName}/issues`, {
         params: {
           state: filters[2].state,
+          page,
           per_page: 5,
         },
       }),
@@ -49,8 +52,34 @@ export default class Repository extends Component {
     });
   }
 
+  handlePage = async action => {
+    const { page } = this.state;
+
+    await this.setState({ page: action === 'forward' ? page + 1 : page - 1 });
+    this.loadIssues();
+  };
+
+  loadIssues = async () => {
+    const { match } = this.props;
+    const { page, filters } = this.state;
+
+    const repoName = decodeURIComponent(match.params.repository);
+
+    const issues = await api.get(`/repos/${repoName}/issues`, {
+      params: {
+        state: filters[2].state,
+        page,
+        per_page: 5,
+      },
+    });
+
+    this.setState({
+      issues: issues.data,
+    });
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -81,6 +110,14 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <Pagination>
+          <button type="button" disabled={page < 2} onClick={this.handlePage}>
+            <MdArrowBack />
+          </button>
+          <button type="button" onClick={() => this.handlePage('forward')}>
+            <MdArrowForward />
+          </button>
+        </Pagination>
       </Container>
     );
   }

@@ -101,3 +101,33 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const IssueFilter = styled.div``;
+
+export const Pagination = styled.div`
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  button {
+    padding: 10px 15px;
+    background-color: #7159c1;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+
+    svg {
+      font-size: 18px;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+
+    & + button {
+      margin-left: 10px;
+    }
+  }
+`;
