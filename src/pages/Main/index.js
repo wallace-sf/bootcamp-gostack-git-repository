@@ -26,7 +26,12 @@ export default class Main extends Component {
 
   // Salvar os dados do localStorage
   componentDidUpdate(_, prevState) {
-    const { repositories } = this.state;
+    const { inputRepoRef } = this;
+    const { repositories, newRepo } = this.state;
+
+    if (prevState.newRepo !== newRepo) {
+      inputRepoRef.current.setCustomValidity('');
+    }
 
     if (prevState.repositories !== repositories) {
       localStorage.setItem('repositories', JSON.stringify(repositories));
@@ -46,6 +51,12 @@ export default class Main extends Component {
     const { newRepo, repositories } = this.state;
 
     try {
+      const repoNames = repositories.map(repository => repository.name);
+
+      if (repoNames.includes(newRepo)) {
+        throw new Error('Repositório duplicado');
+      }
+
       const response = await api.get(`/repos/${newRepo}`);
 
       const data = {
@@ -54,12 +65,14 @@ export default class Main extends Component {
 
       this.setState({
         repositories: [...repositories, data],
+        newRepo: '',
       });
     } catch (err) {
       inputRepoRef.current.setCustomValidity('Invalid Repository');
+      inputRepoRef.current.reportValidity();
     }
 
-    this.setState({ loading: false, newRepo: '' });
+    this.setState({ loading: false });
   };
 
   render() {
@@ -84,8 +97,8 @@ export default class Main extends Component {
             {loading ? (
               <FaSpinner color="#FFF" size={14} />
             ) : (
-              <FaPlus color="#FFF" size={14} />
-            )}
+                <FaPlus color="#FFF" size={14} />
+              )}
           </SubmitButton>
         </Form>
 
